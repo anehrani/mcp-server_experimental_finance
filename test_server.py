@@ -2,11 +2,11 @@ import asyncio
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-async def test_sfinance_server():
+async def test_yfinance_server():
     # Create server parameters
     server_params = StdioServerParameters(
         command="python",
-        args=["sfinance_server.py"],
+        args=["afinance_server.py"],
         env=None
     )
     
@@ -25,14 +25,29 @@ async def test_sfinance_server():
                 for tool in tools.tools:
                     print(f"- {tool.name}: {tool.description}")
                 
-                # Test 2: Get overview
-                print("\n=== Testing get_overview for INFY ===")
-                result = await session.call_tool("get_overview", {"symbol": "INFY"})
+                # Test 2: Get stock info
+                print("\n=== Testing get_stock_info for AAPL ===")
+                result = await session.call_tool("get_stock_info", {"symbol": "AAPL"})
                 print(result.content[0].text)
                 
-                # Test 3: Get income statement  
-                print("\n=== Testing get_income_statement for TCS ===")
-                result = await session.call_tool("get_income_statement", {"symbol": "TCS"})
+                # Test 3: Get historical data
+                print("\n=== Testing get_historical_data for MSFT ===")
+                result = await session.call_tool("get_historical_data", {
+                    "symbol": "MSFT",
+                    "period": "1mo",
+                    "interval": "1d"
+                })
+                response_text = result.content[0].text
+                if len(response_text) > 500:
+                    print(response_text[:500] + "...")
+                else:
+                    print(response_text)
+                
+                # Test 4: Get multiple quotes
+                print("\n=== Testing get_multiple_quotes ===")
+                result = await session.call_tool("get_multiple_quotes", {
+                    "symbols": ["AAPL", "GOOGL", "MSFT"]
+                })
                 response_text = result.content[0].text
                 if len(response_text) > 500:
                     print(response_text[:500] + "...")
@@ -47,4 +62,4 @@ async def test_sfinance_server():
         traceback.print_exc()
 
 if __name__ == "__main__":
-    asyncio.run(test_sfinance_server())
+    asyncio.run(test_yfinance_server())
